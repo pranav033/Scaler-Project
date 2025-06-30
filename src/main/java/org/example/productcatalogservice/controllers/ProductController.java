@@ -3,6 +3,8 @@ package org.example.productcatalogservice.controllers;
 
 import org.example.productcatalogservice.dtos.ProductDto;
 import org.example.productcatalogservice.models.Product;
+import org.example.productcatalogservice.services.IProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -10,6 +12,9 @@ import java.util.List;
 
 @RestController
 public class ProductController {
+
+    @Autowired
+    IProductService iProductService;
 
     @GetMapping("/products")
     public List<ProductDto> getAllProducts() {
