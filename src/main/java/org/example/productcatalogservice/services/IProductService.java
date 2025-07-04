@@ -10,5 +10,5 @@ public interface IProductService {
 
     Product createProduct(Product product);
 
-    List<Product> getAllProducts();
+    List<Product> getAllProducts( );
 }

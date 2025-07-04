@@ -10,6 +10,8 @@ import java.util.List;
 @Setter
 public class CategoryDto {
 
+    private Long id;
+
     private String name;
 
     private String description;
