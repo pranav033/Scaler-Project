@@ -7,6 +7,8 @@ import org.example.productcatalogservice.models.Category;
 import org.example.productcatalogservice.models.Product;
 import org.example.productcatalogservice.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -24,18 +26,37 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}")
-    public  ProductDto getProductById(@PathVariable("id") Long productId) {
-        Product product = iProductService.getProductById(productId);
-        if(product==null) return null;
-        return from(product);
+    public ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long productId) {
+     //   try {
+            if (productId <= 0) {
+                throw new IllegalArgumentException("Product Id not found");
+            }
+
+            Product product = iProductService.getProductById(productId);
+            if (product == null) return null;
+            ProductDto productDto = from(product);
+            return ResponseEntity.ok(productDto);
+
+//        catch (IllegalArgumentException ex)
+//        {
+//            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+//        }
     }
 
-    @PostMapping("products")
+    @PostMapping("/products")
     public ProductDto createProduct(@RequestBody ProductDto productDto) {
         Product product = from(productDto);
         Product outputProduct = iProductService.createProduct(product);
         if(outputProduct==null) return null;
         return from(outputProduct);
+    }
+
+    @PutMapping("/products/{id}")
+    public ProductDto replaceProduct(@PathVariable Long id,@RequestBody ProductDto productDto) {
+        Product product = from(productDto);
+        Product output = iProductService.replaceProduct(product,id);
+        if(output == null) return null;
+        return from(output);
     }
 
     private Product from(ProductDto productDto) {

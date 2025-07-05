@@ -1,13 +1,19 @@
 package org.example.productcatalogservice.services;
 
+import org.example.productcatalogservice.clients.FakeStoreApiClient;
 import org.example.productcatalogservice.dtos.FakeStoreProductDto;
 import org.example.productcatalogservice.models.Category;
 import org.example.productcatalogservice.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -19,41 +25,36 @@ public class FakeStoreProductService implements IProductService{
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
 
+    @Autowired
+    private FakeStoreApiClient fakeStoreApiClient;
+
     @Override
     public Product getProductById(Long id) {
 
-        RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = restTemplate.getForEntity("https://fakestoreapi.com/products/{id}", FakeStoreProductDto.class, id);
-        FakeStoreProductDto fakeStoreProductDto = fakeStoreProductDtoResponseEntity.getBody();
-
-        if(fakeStoreProductDto != null &&
-                fakeStoreProductDtoResponseEntity.getStatusCode() ==
-                        HttpStatus.valueOf(200)) {
-            return from(fakeStoreProductDto);
-        }
-
-        return null;
+        FakeStoreProductDto fakeStoreProductByID = fakeStoreApiClient.getFakeStoreProductByID(id);
+        if(fakeStoreProductByID==null) return null;
+        return from(fakeStoreProductByID);
 
     }
 
     @Override
     public Product createProduct(Product product) {
         FakeStoreProductDto fakeStoreProductDto = from(product);
-        RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = restTemplate.postForEntity("https://fakestoreapi.com/products", fakeStoreProductDto, FakeStoreProductDto.class);
-
-        FakeStoreProductDto fakeStoreProductDtoOutput =
-                fakeStoreProductDtoResponseEntity.getBody();
-
-        if(fakeStoreProductDtoOutput != null &&
-                fakeStoreProductDtoResponseEntity.getStatusCode() ==
-                        HttpStatus.valueOf(200)) {
-            return from(fakeStoreProductDtoOutput);
-        }
-
-        return null;
+        FakeStoreProductDto fakeStoreProductDtoOutput = fakeStoreApiClient.createFakeStoreProduct(fakeStoreProductDto);
+        if(fakeStoreProductDtoOutput==null) return null;
+        return from(fakeStoreProductDtoOutput);
 
     }
+
+    public Product replaceProduct(Product product, Long id)
+    {
+        FakeStoreProductDto fakeStoreProductDto = from(product);
+        FakeStoreProductDto output = fakeStoreApiClient.replaceFakeStoreProduct(fakeStoreProductDto,id);
+        if(output==null) return null;
+        return from(output);
+    }
+
+
 
     @Override
     public List<Product> getAllProducts() {
