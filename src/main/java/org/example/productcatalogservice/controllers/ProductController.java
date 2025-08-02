@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class ProductController {
@@ -22,7 +23,9 @@ public class ProductController {
 
     @GetMapping("/products")
     public List<ProductDto> getAllProducts() {
-        return null;
+        List<Product> products = iProductService.getAllProducts();
+        List<ProductDto> productDtos = products.stream().map(x -> from(x)).collect(Collectors.toList());
+        return productDtos;
     }
 
     @GetMapping("/products/{id}")
