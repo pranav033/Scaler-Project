@@ -16,19 +16,30 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/products")
 public class ProductController {
 
     @Autowired
     IProductService iProductService;
 
-    @GetMapping("/products")
+    @GetMapping("")
     public List<ProductDto> getAllProducts() {
         List<Product> products = iProductService.getAllProducts();
         List<ProductDto> productDtos = products.stream().map(x -> from(x)).collect(Collectors.toList());
         return productDtos;
     }
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/{userId}/{prodId}")
+    public ProductDto getProductDetailsBasedOnUserScope(@PathVariable Long userId,@PathVariable Long prodId)
+    {
+        // This method would typically interact with a service to fetch product details based on user scope.
+        // For now, we return a dummy ProductDto object.
+        Product product = iProductService.getProductDetailsBasedOnUserScope(userId, prodId);
+        if(product == null) return null;
+        return from(product);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long productId) {
      //   try {
         if (productId < 0) {
@@ -49,7 +60,7 @@ public class ProductController {
 //        }
     }
 
-    @PostMapping("/products")
+    @PostMapping("")
     public ProductDto createProduct(@RequestBody ProductDto productDto) {
         Product product = from(productDto);
         Product outputProduct = iProductService.createProduct(product);
@@ -57,7 +68,7 @@ public class ProductController {
         return from(outputProduct);
     }
 
-    @PutMapping("/products/{id}")
+    @PutMapping("/{id}")
     public ProductDto replaceProduct(@PathVariable Long id,@RequestBody ProductDto productDto) {
         Product product = from(productDto);
         Product output = iProductService.replaceProduct(product,id);

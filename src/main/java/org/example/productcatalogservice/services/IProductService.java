@@ -14,4 +14,6 @@ public interface IProductService {
 
     Product replaceProduct(Product product, Long id);
 
+    Product getProductDetailsBasedOnUserScope(Long userId, Long prodId);
+
 }
